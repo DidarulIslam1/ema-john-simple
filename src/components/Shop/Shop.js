@@ -9,7 +9,7 @@ const Shop = () => {
 
     const handleAddToCart = (product) => {
         // console.log('clicked');
-        console.log(product);
+        // console.log(product);
         // cart.push(product); do not use
         const newCart = [...cart, product];
         setCart(newCart);
