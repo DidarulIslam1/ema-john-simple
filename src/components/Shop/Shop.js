@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { addToDb, getStoredCart } from '../../utilities/fakedb';
+import { addToDb, getStoredCart } from '../../utilities/faked';
 import Cart from '../Cart/Cart';
 import Product from '../Product/Product';
 import './Shop.css';
@@ -8,41 +8,41 @@ const Shop = () => {
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
 
-    const handleAddToCart = (product) => {
-        // console.log('clicked');
-        // console.log(product);
-        // cart.push(product); do not use
-        const newCart = [...cart, product];
+    const handleAddToCart = (selectedProduct) => {
+        console.log(selectedProduct);
+        let newCart = [];
+        const exists = cart.find(product => product.id === selectedProduct.id);
+        if (!exists) {
+            selectedProduct.quantity = 1;
+            newCart = [...cart, selectedProduct];
+        }
+        else {
+            const rest = cart.filter(product => product.id !== selectedProduct.id);
+            exists.quantity = exists.quantity + 1;
+            newCart = [...rest, exists];
+        }
         setCart(newCart);
-        addToDb(product.id);
+        addToDb(selectedProduct.id);
     }
     // useEffect(,[]);
     useEffect(() => {
-        console.log('Product load before fetch');
+        // console.log('Product load before fetch');
         fetch('products.json')
             .then(res => res.json())
-            .then(data => {
-                setProducts(data)
-                console.log('Product loaded');
-            })
+            .then(data => setProducts(data))
     }, []);
     useEffect(() => {
-        console.log('Local storage first line', products);
         const storedCart = getStoredCart();
-        console.log(storedCart);
         const savedCart = [];
         for (const id in storedCart) {
-            // console.log(id);
             const addedProduct = products.find(product => product.id === id);
             if (addedProduct) {
-                console.log(addedProduct);
                 const quantity = storedCart[id];
                 addedProduct.quantity = quantity;
                 savedCart.push(addedProduct);
             }
         }
         setCart(savedCart);
-        console.log('Local storage finished');
     }, [products])
     return (
         <div className='shop-container'>
